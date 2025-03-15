@@ -2,6 +2,8 @@
 ## About
 This Project involves a Point Robot in an Enivonment with obstacles, and it must navigate from a start point to a goal point and find the optimal path using the BFS (Breadth First Search) Algorithm. The obstacles in the environment are formed using Semi Algebraic Inequalities and Half Planes
 
+Link to repository : github.com/khuzema-h/Path_Planner
+
 ## Dependencies
 Ensure you have the following Dependencies in order to run the code
 - Python 3
