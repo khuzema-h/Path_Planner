@@ -71,7 +71,7 @@ def shape_6(x, y):
     # Inner circle (radius = 6, to create the "6" shape)
     inner_circle = ((x - center_x)**2 + (y - center_y)**2 <= 4**2) & (97 <= x) & (x <= 115) & (10 <= y) & (y <= 38)
     vertical_line = (97 <= x) & (x <= 102) & (19 <= y) & (y <= 38)
-    return outer_circle & & np.logical_not(inner_circle) | vertical_line 
+    return outer_circle & np.logical_not(inner_circle) | vertical_line 
 
 def shape_1(x,y):
     vertical_line = (143 <= x) & (x <= 148) & (10 <= y) & (y <= 38)
