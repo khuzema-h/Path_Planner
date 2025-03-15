@@ -71,16 +71,16 @@ def shape_6(x, y):
     # Inner circle (radius = 6, to create the "6" shape)
     inner_circle = ((x - center_x)**2 + (y - center_y)**2 <= 4**2) & (97 <= x) & (x <= 115) & (10 <= y) & (y <= 38)
     vertical_line = (97 <= x) & (x <= 102) & (19 <= y) & (y <= 38)
-    return outer_circle & np.logical_not(inner_circle) | vertical_line 
+    return outer_circle & & np.logical_not(inner_circle) | vertical_line 
 
 def shape_1(x,y):
     vertical_line = (143 <= x) & (x <= 148) & (10 <= y) & (y <= 38)
     return vertical_line
 
-
 # Combine all shapes
 def all_shapes(x, y):
-    return shape_E(x, y) | shape_N(x, y) | shape_P(x,y) | shape_M(x,y) | shape_6(x,y) | shape_6(x-23,y) | shape_1(x,y)
+    return shape_E(x, y) | shape_N(x, y) | shape_P(x, y) | shape_M(x, y) | shape_6(x, y) | shape_6(x - 23, y) | shape_1(x, y)
+
 # Create a blank white image
 width, height = 180, 50  # Dimensions in millimeters
 mm_to_pixels = 5  # Conversion factor from mm to pixels
@@ -94,6 +94,12 @@ for x in range(width_pixels):
         y = height_pixels - 1 - y_opencv  # Flip y-coordinate when reading with opencv to ensure that the origin is at the bottom left
         if all_shapes(x / mm_to_pixels, y / mm_to_pixels):
             image[y_opencv, x] = 0  # Mark the pixel as part of the obstacle
+
+# Add 2 mm clearance around obstacles
+clearance_pixels = int(2 * mm_to_pixels)  # Convert 2 mm to pixels
+kernel = np.ones((clearance_pixels, clearance_pixels), np.uint8)  # Create a kernel for dilation
+dilated_image = cv2.dilate(image[:, :, 0], kernel, iterations=1)  # Dilate the obstacle regions
+image[dilated_image == 0] = 0  # Update the image with the expanded obstacles
 
 # Define the actions as separate functions
 def move_right(node):
@@ -123,13 +129,13 @@ def move_down_left(node):
 # Define the actions set
 actions_set = [move_right, move_left, move_up, move_down, move_up_right, move_up_left, move_down_right, move_down_left]
 
-# BFS algorithm 
+# BFS algorithm
 def bfs(start, goal, map):
     queue = deque()
     queue.append(start)
     visited = set()
     visited.add(start)
-    came_from = {}  
+    came_from = {}
     path_iteration = 0
 
     while queue:
@@ -144,9 +150,8 @@ def bfs(start, goal, map):
             path.reverse()
 
             for node in path:
-                map[node[1], node[0]] = [0, 0, 255] 
+                map[node[1], node[0]] = [0, 0, 255]  # Mark the path in red
 
-          
             frame = cv2.cvtColor(map, cv2.COLOR_RGB2BGR)
             out.write(frame)
 
@@ -159,10 +164,8 @@ def bfs(start, goal, map):
                 queue.append(next_node)
                 visited.add(next_node)
                 came_from[next_node] = current_node
-                # Update the color of the scanned pixel to green
-                map[next_node[1], next_node[0]] = [255, 100, 0]  # Orange color
+                map[next_node[1], next_node[0]] = [255, 100, 0]  # Mark scanned pixels in green
 
-                # Write the current frame to the video periodically
                 if path_iteration % 100 == 0:  # Write every 100 iterations
                     frame = cv2.cvtColor(map, cv2.COLOR_RGB2BGR)
                     out.write(frame)
@@ -173,10 +176,9 @@ def bfs(start, goal, map):
 # Video setup
 video_name = 'bfs_path_planner.mp4'
 fourcc = cv2.VideoWriter_fourcc(*'mp4v')  # Codec for .mp4
-out = cv2.VideoWriter(video_name, fourcc, 120, (width_pixels, height_pixels)) #120 fps for a quicker animation
+out = cv2.VideoWriter(video_name, fourcc, 120, (width_pixels, height_pixels))  # 120 fps for a quicker animation
 
-######## Start Screen ##########
-
+# Start Screen
 print(r"""____________ _____  ______     _   _      ______ _                             
 | ___ \  ___/  ___| | ___ \   | | | |     | ___ \ |                            
 | |_/ / |_  \ `--.  | |_/ /_ _| |_| |__   | |_/ / | __ _ _ __  _ __   ___ _ __ 
@@ -191,9 +193,9 @@ print("Workspace is 180 mm wide and 50 mm in height, please enter valid coordina
 while True:
     start_x = int(input("Enter the Start Coordinate(x): "))
     start_y = int(input("Enter the Start Coordinate(y): "))
-    start_x +=1
-    start_y +=1
-    
+    start_x += 1
+    start_y += 1
+
     start_x_px = mm_to_pixels * start_x
     start_y_px = height_pixels - (mm_to_pixels * start_y)  # Flip y-coordinate
 
