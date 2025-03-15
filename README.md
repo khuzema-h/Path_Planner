@@ -8,6 +8,9 @@ Ensure you have the following Dependencies in order to run the code
 - Matplotlib
 - Opencv (cv2)
 - Numpy
+  
+### View Map of Environment
+Run **map.py** to view the map generated for the environment
 
 ## Running the Code 
 - Run the file names **BFS_khuzema_habib.py**
@@ -16,4 +19,17 @@ Ensure you have the following Dependencies in order to run the code
 - The program then prints the time taken to find the path in the terminal console and displays an image of the path taken as well as the searched area
 - A video file of the animation is saved as 'bfs_path_planner.mp4'
 
+## Sample Code Output
+
+Workspace is 180 mm wide and 50 mm in height, please enter valid coordinates within the given range...
+
+Enter the Start Coordinate(x): 0
+Enter the Start Coordinate(y): 0
+Start Coordinates are Valid, Proceeding....
+Enter Goal coordinate(x): 170
+Enter Goal coordinate(y): 20
+Goal coordinates are valid. Finding Path with BFS...
+Time taken to find the path: 3.1321 seconds
+Path found!
+Video saved as bfs_path_planner.mp4
 
